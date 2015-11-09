@@ -3,24 +3,47 @@ package com.abc;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import com.bank.exceptions.vo.NoAccounts;
-
 public class Bank {
     private List<Customer> customers;
-
-    public Bank() {
+private static Bank bank;
+    private Bank() {
         customers = new ArrayList<Customer>();
+        
+    }
+    
+    public static  Bank getInstance(){
+    	 if(bank==null){
+    		 bank = new Bank();
+    	 }
+    	 return bank;
     }
 
-    public void addCustomer(Customer customer) {
-             customers.add(customer);
+    public boolean addCustomer(Customer customer) {
+    	boolean custFlag=findCustomer(customer);
+    	if(custFlag){
+    	getCustomers().add(customer);
+    	}
+    	
+    	return custFlag;
     	
     } 
+    
+    private boolean findCustomer(Customer customer){
+    	if(getCustomers()!=null&&getCustomers().size()>0){
+    		
+    		for(Customer cust : getCustomers()){
+    			if(customer.getSsn().equals(cust.getSsn())){
+    				return false;
+    			}
+    		}
+    		//return true;
+    	}
+    	return true;
+    }
 
     public String customerSummary() {
         String summary = "Customer Summary";
-        for (Customer c : customers)
+        for (Customer c : getCustomers())
             summary += "\n - " + c.getName() + " (" + format(c.getNumberOfAccounts(), "account") + ")";
         return summary;
     }
@@ -33,20 +56,29 @@ public class Bank {
 
     public double totalInterestPaid() {
         double total = 0;
-        for(Customer c: customers)
+        for(Customer c: getCustomers())
             total += c.totalInterestEarned();
+        
         return total;
     }
 
     public String getFirstCustomer() {
         try {
-                  if(customers.size()>0){
-                	  return  customers.get(0).getName();
+                  if(getCustomers().size()>0){
+                	  return  getCustomers().get(0).getName();
                   }
-            return "No Data Found";
+            return "No Customers Found";
         } catch (Exception e){
             e.printStackTrace();
             return "Error";
         }
     }
+
+	public List<Customer> getCustomers() {
+		return customers;
+	}
+
+	public void setCustomers(List<Customer> customers) {
+		this.customers = customers;
+	}    
 }
